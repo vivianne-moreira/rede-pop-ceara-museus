@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="8" fill="#0F2A4A"/>
+  <!-- Colunas de museu estilizadas -->
+  <rect x="4" y="19" width="4" height="8" fill="white" rx="1"/>
+  <rect x="10" y="13" width="4" height="14" fill="white" rx="1"/>
+  <rect x="18" y="16" width="4" height="11" fill="white" rx="1"/>
+  <rect x="24" y="10" width="4" height="17" fill="white" rx="1"/>
+  <!-- Linha de topo (arquitrave) -->
+  <rect x="3" y="7" width="26" height="2.5" fill="#E8A020" rx="1"/>
+</svg>
