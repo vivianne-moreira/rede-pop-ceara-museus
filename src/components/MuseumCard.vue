@@ -1,6 +1,7 @@
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { getCategoryStyle } from '@/composables/useMuseums'
+import QrcodeVue from 'qrcode.vue'
 
 const props = defineProps({
   museum: {
@@ -30,6 +31,32 @@ const displayPhone = computed(() => {
   }
   return raw
 })
+
+// --- LÓGICA DO QR CODE ---
+const showQR = ref(false)
+
+// Monta a URL dinâmica apontando para a página do museu no sistema em produção
+const museumUrl = computed(() => {
+  // Ajuste a URL base para o domínio real do seu projeto na Vercel
+  const baseUrl = 'https://rede-pop-ceara-museus.vercel.app/museu'
+  // Usa o ID se existir, senão usa o nome formatado para URL amigável
+  const idPath = props.museum.id || props.museum.nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-').toLowerCase()
+  return `${baseUrl}/${idPath}`
+})
+
+// Função para exportar e baixar o Canvas gerado como imagem PNG
+const downloadQRCode = (e) => {
+  const canvas = e.target.parentElement.querySelector('canvas')
+  if (canvas) {
+    const url = canvas.toDataURL('image/png')
+    const link = document.createElement('a')
+    link.href = url
+    // Salva o arquivo com o nome limpo do museu
+    const cleanName = props.museum.nome.replace(/[^a-z0-9]/gi, '_').toLowerCase()
+    link.download = `QR_${cleanName}.png`
+    link.click()
+  }
+}
 </script>
 
 <template>
@@ -144,7 +171,34 @@ const displayPhone = computed(() => {
         </a>
       </div>
 
-      <div class="flex items-center gap-2 pt-3 mt-1 border-t border-slate-100 flex-wrap">
+      <!-- BOTÃO E ÁREA DO QR CODE -->
+      <div class="pt-2 border-t border-slate-100 flex flex-col gap-2">
+        <button
+          @click="showQR = !showQR"
+          class="w-full py-2 px-3 rounded-xl text-[11px] font-bold border transition-all flex items-center justify-center gap-1.5"
+          :class="showQR ? 'bg-teal-700 text-white border-teal-800 hover:bg-teal-800' : 'bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-100'"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="6" height="6" rx="1" />
+            <rect x="15" y="3" width="6" height="6" rx="1" />
+            <rect x="3" y="15" width="6" height="6" rx="1" />
+            <path d="M15 15h6v6h-6z" />
+          </svg>
+          {{ showQR ? 'Ocultar QR Code' : 'Gerar QR Code' }}
+        </button>
+
+        <div v-if="showQR" class="flex flex-col items-center justify-center p-3 bg-slate-50 border border-slate-200 rounded-xl mt-1 animate-in fade-in slide-in-from-top-2">
+          <!-- Componente do QR Code que renderiza o Canvas -->
+          <qrcode-vue :value="museumUrl" :size="140" level="H" render-as="canvas" class="bg-white p-2 rounded shadow-sm border border-slate-200" />
+          
+          <button @click="downloadQRCode" class="mt-3 text-[10px] font-bold text-teal-600 hover:text-teal-800 underline uppercase tracking-wider flex items-center gap-1">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+            Baixar para Impressão
+          </button>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 pt-2 flex-wrap">
         <button
           @click="$emit('edit', museum)"
           class="flex-1 py-2 px-3 rounded-xl text-[11px] font-bold border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all"

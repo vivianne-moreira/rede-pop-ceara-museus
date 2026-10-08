@@ -12,6 +12,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.112.3",
     "leaflet": "^1.9.4",
+    "qrcode.vue": "^3.11.0",
     "vue": "^3.4.0",
     "vue-router": "^4.3.0"
   },

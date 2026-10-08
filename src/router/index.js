@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
+import MuseumDetails from '@/components/MuseumDetails.vue'
 
 const routes = [
   {
@@ -10,6 +11,14 @@ const routes = [
       title: 'Mapa de Museus — Rede Pop Ceará',
     },
   },
+  {
+  path: '/museu/:id',
+  name: 'MuseumDetails',
+  component: MuseumDetails,
+  meta: {
+    title: 'Detalhes do Museu — Rede Pop Ceará',
+  },
+}
 ]
 
 const router = createRouter({
