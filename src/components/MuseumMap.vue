@@ -78,7 +78,7 @@ function createPopupContent(museum) {
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
           ${museum.cidade}, CE
         </p>
-        <a href="${museum.mapsUrl || '#'}" target="_blank" rel="noopener noreferrer" style="display:inline-flex; align-items:center; justify-content:center; gap:6px; width:100%; padding:7px 0; border-radius:10px; background:${color}; color:white; font-size:12px; font-weight:600; text-decoration:none; box-sizing:border-box;" ${!museum.mapsUrl ? 'aria-disabled="true" style="pointer-events:none;opacity:0.5;"' : ''}>
+        <a href="${museum.maps_url || '#'}" target="_blank" rel="noopener noreferrer" style="display:inline-flex; align-items:center; justify-content:center; gap:6px; width:100%; padding:7px 0; border-radius:10px; background:${color}; color:white; font-size:12px; font-weight:600; text-decoration:none; box-sizing:border-box;" ${!museum.maps_url ? 'aria-disabled="true" style="pointer-events:none;opacity:0.5;"' : ''}>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
           Ver no Google Maps
         </a>

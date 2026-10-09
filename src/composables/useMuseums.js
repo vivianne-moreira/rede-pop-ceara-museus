@@ -59,7 +59,6 @@ export function getCategoryStyle(category) {
   return CATEGORY_COLORS[category] ?? CATEGORY_COLORS['Não informado']
 }
 
-// Estado global reativo
 const allMuseums = ref([])
 
 export function useMuseums() {
@@ -81,39 +80,47 @@ export function useMuseums() {
     allMuseums.value = data
   }
 
-  // Carrega os museus automaticamente ao abrir a tela
   onMounted(() => {
     if (allMuseums.value.length === 0) fetchMuseums()
   })
 
-// 2. ATUALIZAR MUSEU EXISTENTE
+  // 2. ATUALIZAR MUSEU EXISTENTE (COM DIAGNÓSTICO)
   const updateMuseum = async (id, museumData) => {
     try {
-      // Clona os dados e ajusta o nome da coluna do Maps para o padrão do Supabase
-      const dadosFormatados = { ...museumData }
-      if (dadosFormatados.mapsUrl !== undefined) {
-        dadosFormatados.maps_url = dadosFormatados.mapsUrl
-        delete dadosFormatados.mapsUrl // Remove a chave antiga
-      }
+      const payload = { ...museumData }
+      const link = payload.link_google_maps || payload.maps_url || payload.mapsUrl || ''
+      payload.link_google_maps = link
+      payload.maps_url = link
+      delete payload.mapsUrl
+
+      delete payload.id
+      if (payload.lat === null || payload.lat === '') delete payload.lat
+      if (payload.lng === null || payload.lng === '') delete payload.lng
 
       const { data, error } = await supabase
         .from('museus')
-        .update(dadosFormatados)
+        .update(payload)
         .eq('id', id)
         .select()
 
-      if (error) throw error
+      if (error) {
+        // Se a coluna maps_url não existir na tabela, tenta apenas com link_google_maps
+        delete payload.maps_url
+        const res = await supabase.from('museus').update(payload).eq('id', id).select()
+        if (res.error) throw res.error
+        if (res.data?.[0]) data = res.data
+      }
 
-      if (data) {
+      if (data && data[0]) {
         const index = allMuseums.value.findIndex(m => m.id === id)
         if (index !== -1) {
           allMuseums.value[index] = data[0]
         }
-        alert('Equipamento atualizado com sucesso!') // Aviso adicionado
+        alert('Equipamento atualizado com sucesso!')
       }
     } catch (error) {
       console.error('Erro ao atualizar museu:', error)
-      alert('Erro ao atualizar. Verifique os dados e tente novamente.')
+      alert(`Erro ao atualizar: ${error.message}`)
     }
   }
 
@@ -128,7 +135,7 @@ export function useMuseums() {
       .eq('id', museum.id)
       .select()
 
-    if (!error && data) {
+    if (!error && data && data[0]) {
       const index = allMuseums.value.findIndex(m => m.id === museum.id)
       if (index !== -1) {
         allMuseums.value[index] = data[0]
@@ -136,42 +143,33 @@ export function useMuseums() {
     }
   }
 
-// 4. CADASTRAR NOVO MUSEU
+  // 4. CADASTRAR NOVO MUSEU
   const addMuseum = async (museumData) => {
     try {
-      // Clona os dados
-      const dadosFormatados = { ...museumData }
+      const payload = { ...museumData }
       
-      // Ajusta o nome da coluna do Maps
-      if (dadosFormatados.mapsUrl !== undefined) {
-        dadosFormatados.maps_url = dadosFormatados.mapsUrl
-        delete dadosFormatados.mapsUrl
-      }
-      
-      // Remove o ID para o banco gerar sozinho
-      if (!dadosFormatados.id) {
-        delete dadosFormatados.id
+      if (payload.mapsUrl !== undefined) {
+        payload.maps_url = payload.mapsUrl
+        delete payload.mapsUrl
       }
 
-      // PREVENÇÃO DE ERROS 400:
-      // 1. Apagar campos nulos de coordenadas (evita conflito de tipos numéricos)
-      if (dadosFormatados.lat === null || dadosFormatados.lat === '') delete dadosFormatados.lat
-      if (dadosFormatados.lng === null || dadosFormatados.lng === '') delete dadosFormatados.lng
+      delete payload.id
+      if (payload.lat === null || payload.lat === '') delete payload.lat
+      if (payload.lng === null || payload.lng === '') delete payload.lng
       
-      // 2. Garantir que o museu novo entra sempre como não revisado por segurança
-      dadosFormatados.revisado = false
+      payload.revisado = false
 
       const { data, error } = await supabase
         .from('museus')
-        .insert([dadosFormatados])
+        .insert([payload])
         .select()
       
       if (error) {
-        alert(`O Supabase recusou a gravação:\n\nMotivo: ${error.message}\nDetalhes: ${error.details}`)
+        alert(`Erro do Supabase: ${error.message}`)
         throw error
       }
 
-      if (data) {
+      if (data && data[0]) {
         allMuseums.value.unshift(data[0])
         alert('Museu cadastrado com sucesso!')
       }
@@ -180,7 +178,6 @@ export function useMuseums() {
     }
   }
 
-  // 5. LÓGICA DE FILTROS E CATEGORIAS
   const allCategories = computed(() => {
     const cats = new Set(allMuseums.value.map((m) => m.categoria))
     return [...cats].sort()

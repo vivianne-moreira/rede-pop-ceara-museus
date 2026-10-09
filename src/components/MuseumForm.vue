@@ -51,11 +51,12 @@
             <input v-model="formData.site" type="url" class="w-full p-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 bg-slate-50" />
           </div>
         </div>
-
-        <div>
-          <label class="block mb-1 text-xs font-semibold text-slate-600">Link do Google Maps</label>
-          <input v-model="formData.mapsUrl" type="url" class="w-full p-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 bg-slate-50" />
-        </div>
+<input 
+  v-model="formData.maps_url" 
+  type="text" 
+  placeholder="https://maps.app.goo.gl/..." 
+  class="w-full p-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 bg-slate-50" 
+/>
 
         <div>
           <label class="block mb-1 text-xs font-semibold text-slate-600">Observações / Notas</label>
@@ -89,19 +90,33 @@ const emit = defineEmits(['close', 'save'])
 
 const isEditing = ref(false)
 const formData = ref({
-  nome: '', cidade: '', categoria: 'Não informado', endereco: '',
-  telefone: '', email: '', site: '', mapsUrl: '', acessibilidade: '',
-  observacoes: '', lat: null, lng: null
+  nome: '', 
+  cidade: '', 
+  categoria: 'Não informado', 
+  endereco: '',
+  telefone: '', 
+  email: '', 
+  site: '', 
+  maps_url: '', 
+  acessibilidade: '',
+  observacoes: '', 
+  lat: null, 
+  lng: null
 })
 
 onMounted(() => {
   if (props.initialData) {
     isEditing.value = true
-    formData.value = { ...props.initialData }
+    formData.value = {
+      ...props.initialData,
+      maps_url: props.initialData.maps_url || props.initialData.mapsUrl || ''
+    }
+    console.log('📝 FORM ABERTO PARA EDIÇÃO COM DADOS:', formData.value)
   }
 })
 
 const handleSubmit = () => {
-  emit('save', formData.value)
+  console.log('🚀 BOTÃO SALVAR PRESSIONADO! Emitindo dados:', formData.value)
+  emit('save', { ...formData.value })
 }
 </script>
