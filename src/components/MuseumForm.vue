@@ -51,12 +51,11 @@
             <input v-model="formData.site" type="url" class="w-full p-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 bg-slate-50" />
           </div>
         </div>
-<input 
-  v-model="formData.maps_url" 
-  type="text" 
-  placeholder="https://maps.app.goo.gl/..." 
-  class="w-full p-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 bg-slate-50" 
-/>
+        
+          <div>
+          <label class="block mb-1 text-xs font-semibold text-slate-600 ">Link Google Maps</label>
+          <textarea v-model="formData.maps_url" rows="2" class="w-full p-2.5 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600 bg-slate-50"></textarea>
+        </div>
 
         <div>
           <label class="block mb-1 text-xs font-semibold text-slate-600">Observações / Notas</label>
@@ -107,16 +106,21 @@ const formData = ref({
 onMounted(() => {
   if (props.initialData) {
     isEditing.value = true
+    const mapa = props.initialData.link_google_maps || props.initialData.maps_url || props.initialData.mapsUrl || ''
     formData.value = {
       ...props.initialData,
-      maps_url: props.initialData.maps_url || props.initialData.mapsUrl || ''
+      maps_url: mapa,
+      link_google_maps: mapa
     }
-    console.log('📝 FORM ABERTO PARA EDIÇÃO COM DADOS:', formData.value)
   }
 })
 
 const handleSubmit = () => {
-  console.log('🚀 BOTÃO SALVAR PRESSIONADO! Emitindo dados:', formData.value)
-  emit('save', { ...formData.value })
+  const dados = { ...formData.value }
+  // Sincroniza os dois nomes para garantir
+  const link = dados.maps_url || dados.link_google_maps || ''
+  dados.maps_url = link
+  dados.link_google_maps = link
+  emit('save', dados)
 }
 </script>

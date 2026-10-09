@@ -84,16 +84,17 @@ export function useMuseums() {
     if (allMuseums.value.length === 0) fetchMuseums()
   })
 
-  // 2. ATUALIZAR MUSEU EXISTENTE (COM DIAGNÓSTICO)
+ // 2. ATUALIZAR MUSEU EXISTENTE
   const updateMuseum = async (id, museumData) => {
     try {
       const payload = { ...museumData }
-      const link = payload.link_google_maps || payload.maps_url || payload.mapsUrl || ''
-      payload.link_google_maps = link
-      payload.maps_url = link
-      delete payload.mapsUrl
 
+      // Garante maps_url e remove campos que não existem na tabela
+      payload.maps_url = payload.maps_url || payload.mapsUrl || payload.link_google_maps || ''
+      delete payload.mapsUrl
+      delete payload.link_google_maps
       delete payload.id
+
       if (payload.lat === null || payload.lat === '') delete payload.lat
       if (payload.lng === null || payload.lng === '') delete payload.lng
 
@@ -104,23 +105,19 @@ export function useMuseums() {
         .select()
 
       if (error) {
-        // Se a coluna maps_url não existir na tabela, tenta apenas com link_google_maps
-        delete payload.maps_url
-        const res = await supabase.from('museus').update(payload).eq('id', id).select()
-        if (res.error) throw res.error
-        if (res.data?.[0]) data = res.data
+        alert(`Erro Supabase: ${error.message}`)
+        throw error
       }
 
       if (data && data[0]) {
         const index = allMuseums.value.findIndex(m => m.id === id)
         if (index !== -1) {
-          allMuseums.value[index] = data[0]
+          allMuseums.value[index] = { ...data[0] }
         }
         alert('Equipamento atualizado com sucesso!')
       }
     } catch (error) {
       console.error('Erro ao atualizar museu:', error)
-      alert(`Erro ao atualizar: ${error.message}`)
     }
   }
 
