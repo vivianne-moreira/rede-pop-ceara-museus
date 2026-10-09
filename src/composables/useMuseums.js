@@ -86,19 +86,34 @@ export function useMuseums() {
     if (allMuseums.value.length === 0) fetchMuseums()
   })
 
-  // 2. ATUALIZAR MUSEU EXISTENTE
+// 2. ATUALIZAR MUSEU EXISTENTE
   const updateMuseum = async (id, museumData) => {
-    const { data, error } = await supabase
-      .from('museus')
-      .update(museumData)
-      .eq('id', id)
-      .select()
-
-    if (!error && data) {
-      const index = allMuseums.value.findIndex(m => m.id === id)
-      if (index !== -1) {
-        allMuseums.value[index] = data[0]
+    try {
+      // Clona os dados e ajusta o nome da coluna do Maps para o padrão do Supabase
+      const dadosFormatados = { ...museumData }
+      if (dadosFormatados.mapsUrl !== undefined) {
+        dadosFormatados.maps_url = dadosFormatados.mapsUrl
+        delete dadosFormatados.mapsUrl // Remove a chave antiga
       }
+
+      const { data, error } = await supabase
+        .from('museus')
+        .update(dadosFormatados)
+        .eq('id', id)
+        .select()
+
+      if (error) throw error
+
+      if (data) {
+        const index = allMuseums.value.findIndex(m => m.id === id)
+        if (index !== -1) {
+          allMuseums.value[index] = data[0]
+        }
+        alert('Equipamento atualizado com sucesso!') // Aviso adicionado
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar museu:', error)
+      alert('Erro ao atualizar. Verifique os dados e tente novamente.')
     }
   }
 
@@ -121,15 +136,47 @@ export function useMuseums() {
     }
   }
 
-  // 4. CADASTRAR NOVO MUSEU
+// 4. CADASTRAR NOVO MUSEU
   const addMuseum = async (museumData) => {
-    const { data, error } = await supabase
-      .from('museus')
-      .insert([museumData])
-      .select()
-    
-    if (!error && data) {
-      allMuseums.value.unshift(data[0]) // Adiciona no topo da lista
+    try {
+      // Clona os dados
+      const dadosFormatados = { ...museumData }
+      
+      // Ajusta o nome da coluna do Maps
+      if (dadosFormatados.mapsUrl !== undefined) {
+        dadosFormatados.maps_url = dadosFormatados.mapsUrl
+        delete dadosFormatados.mapsUrl
+      }
+      
+      // Remove o ID para o banco gerar sozinho
+      if (!dadosFormatados.id) {
+        delete dadosFormatados.id
+      }
+
+      // PREVENÇÃO DE ERROS 400:
+      // 1. Apagar campos nulos de coordenadas (evita conflito de tipos numéricos)
+      if (dadosFormatados.lat === null || dadosFormatados.lat === '') delete dadosFormatados.lat
+      if (dadosFormatados.lng === null || dadosFormatados.lng === '') delete dadosFormatados.lng
+      
+      // 2. Garantir que o museu novo entra sempre como não revisado por segurança
+      dadosFormatados.revisado = false
+
+      const { data, error } = await supabase
+        .from('museus')
+        .insert([dadosFormatados])
+        .select()
+      
+      if (error) {
+        alert(`O Supabase recusou a gravação:\n\nMotivo: ${error.message}\nDetalhes: ${error.details}`)
+        throw error
+      }
+
+      if (data) {
+        allMuseums.value.unshift(data[0])
+        alert('Museu cadastrado com sucesso!')
+      }
+    } catch (error) {
+      console.error('Erro ao cadastrar museu:', error)
     }
   }
 
@@ -153,7 +200,6 @@ export function useMuseums() {
     })
   })
 
-  // Retorna os IDs dos museus revisados para o Vue pintar de laranja
   const verifiedMuseums = computed(() => {
     return allMuseums.value.filter(m => m.revisado).map(m => m.id)
   })
