@@ -2,61 +2,117 @@ import { ref, computed, onMounted } from 'vue'
 import { supabase } from '../supabase'
 
 export const CATEGORY_COLORS = {
-  'História': { border: '#D97706', badge: 'bg-amber-100 text-amber-800' },
-  'História / Patrimônio': { border: '#B45309', badge: 'bg-amber-100 text-amber-800' },
-  'História / Cultura Local': { border: '#F59E0B', badge: 'bg-yellow-100 text-yellow-800' },
-  'História / Cultura Regional': { border: '#EAB308', badge: 'bg-yellow-100 text-yellow-800' },
-  'História / Imagem e Som': { border: '#EA580C', badge: 'bg-orange-100 text-orange-800' },
-  'Imagem e Som / História': { border: '#EA580C', badge: 'bg-orange-100 text-orange-800' },
-  'História Industrial': { border: '#57534E', badge: 'bg-stone-100 text-stone-800' },
-  'História Ferroviária': { border: '#78716C', badge: 'bg-stone-100 text-stone-800' },
-  'História / Abolição': { border: '#991B1B', badge: 'bg-red-100 text-red-800' },
-  'Memória / Diversidade': { border: '#C026D3', badge: 'bg-fuchsia-100 text-fuchsia-800' },
-  'Memória / Patrimônio': { border: '#BE185D', badge: 'bg-pink-100 text-pink-800' },
-  'Memória / Patrimônio Histórico': { border: '#9D174D', badge: 'bg-pink-100 text-pink-800' },
-  'Memória / História Local': { border: '#E11D48', badge: 'bg-rose-100 text-rose-800' },
-  'Memória Comunitária': { border: '#F43F5E', badge: 'bg-rose-100 text-rose-800' },
-  'Memória Educacional': { border: '#0284C7', badge: 'bg-sky-100 text-sky-800' },
-  'Educação / Memória': { border: '#0369A1', badge: 'bg-sky-100 text-sky-800' },
-  'Memória Institucional / Política': { border: '#334155', badge: 'bg-slate-100 text-slate-800' },
-  'Memória Institucional / Jurídica': { border: '#475569', badge: 'bg-slate-100 text-slate-800' },
-  'Memória Política': { border: '#1E293B', badge: 'bg-slate-100 text-slate-800' },
-  'Memória / Direitos Humanos': { border: '#4F46E5', badge: 'bg-indigo-100 text-indigo-800' },
-  'Memória / Resistência': { border: '#DC2626', badge: 'bg-red-100 text-red-800' },
-  'Memória / Pesca': { border: '#0D9488', badge: 'bg-teal-100 text-teal-800' },
-  'Artes': { border: '#7C3AED', badge: 'bg-violet-100 text-violet-800' },
-  'Artes / Cultura': { border: '#6D28D9', badge: 'bg-violet-100 text-violet-800' },
-  'Arte / Cultura': { border: '#8B5CF6', badge: 'bg-violet-100 text-violet-800' },
-  'Cultura / Artes': { border: '#5B21B6', badge: 'bg-violet-100 text-violet-800' },
-  'Artes Visuais': { border: '#9333EA', badge: 'bg-purple-100 text-purple-800' },
-  'Artes / Fotografia': { border: '#4338CA', badge: 'bg-indigo-100 text-indigo-800' },
-  'Artes, Arquitetura e Linguística': { border: '#A21CAF', badge: 'bg-fuchsia-100 text-fuchsia-800' },
-  'Arte Popular': { border: '#D946EF', badge: 'bg-fuchsia-100 text-fuchsia-800' },
-  'Arte Popular / Artesanato': { border: '#C026D3', badge: 'bg-fuchsia-100 text-fuchsia-800' },
-  'Cultura Popular': { border: '#F97316', badge: 'bg-orange-100 text-orange-800' },
-  'Cultura Popular / Música': { border: '#F59E0B', badge: 'bg-yellow-100 text-yellow-800' },
-  'Cultura Regional': { border: '#FB923C', badge: 'bg-orange-100 text-orange-800' },
-  'Cultura Infantil / Brinquedos': { border: '#EC4899', badge: 'bg-pink-100 text-pink-800' },
-  'Cultura / Gastronomia': { border: '#EF4444', badge: 'bg-red-100 text-red-800' },
-  'Cultura Regional / Gastronomia': { border: '#B91C1C', badge: 'bg-red-100 text-red-800' },
-  'Cultura / Lazer': { border: '#14B8A6', badge: 'bg-teal-100 text-teal-800' },
-  'Clássico / Tradicional': { border: '#A8A29E', badge: 'bg-stone-100 text-stone-800' },
-  'Turismo / Cultura': { border: '#06B6D4', badge: 'bg-cyan-100 text-cyan-800' },
-  'Ciências Exatas, da Terra, Biológicas e da Saúde': { border: '#059669', badge: 'bg-emerald-100 text-emerald-800' },
-  'Ciências / Educação': { border: '#10B981', badge: 'bg-emerald-100 text-emerald-800' },
-  'Ciências / Astronomia': { border: '#1D4ED8', badge: 'bg-blue-100 text-blue-800' },
-  'Ecomuseu / Meio Ambiente': { border: '#65A30D', badge: 'bg-lime-100 text-lime-800' },
-  'Indígena / Etnologia': { border: '#84CC16', badge: 'bg-lime-100 text-lime-800' },
-  'Cultura Indígena / Memória': { border: '#4D7C0F', badge: 'bg-lime-100 text-lime-800' },
-  'Antropologia e Arqueologia': { border: '#15803D', badge: 'bg-green-100 text-green-800' },
-  'Arqueologia / Patrimônio': { border: '#166534', badge: 'bg-green-100 text-green-800' },
-  'Antropologia e Arqueologia / Ecomuseu': { border: '#047857', badge: 'bg-emerald-100 text-emerald-800' },
-  'Gestão / Política Cultural': { border: '#64748B', badge: 'bg-slate-100 text-slate-800' },
-  'Não informado': { border: '#94A3B8', badge: 'bg-slate-100 text-slate-600' },
+  'Artes Visuais': { border: '#7C3AED', badge: 'bg-violet-100 text-violet-900' },
+  'Artes e Cultura': { border: '#8B5CF6', badge: 'bg-purple-100 text-purple-900' },
+  'Arte Popular e Artesanato': { border: '#A855F7', badge: 'bg-fuchsia-100 text-fuchsia-900' },
+  'Fotografia e Imagem': { border: '#6366F1', badge: 'bg-indigo-100 text-indigo-900' },
+
+  'História': { border: '#D97706', badge: 'bg-amber-100 text-amber-900' },
+  'Patrimônio Histórico': { border: '#EA580C', badge: 'bg-orange-100 text-orange-950' },
+  'História Local e Regional': { border: '#F97316', badge: 'bg-orange-100 text-orange-900' },
+  'Arqueologia e Antropologia': { border: '#0D9488', badge: 'bg-teal-100 text-teal-900' }, // Turquesa mineral no lugar do marrom
+  'História Ferroviária e Industrial': { border: '#0284C7', badge: 'bg-sky-100 text-sky-900' }, // Azul celeste no lugar do cinza/stone
+  'História e Abolição': { border: '#BE123C', badge: 'bg-rose-100 text-rose-950' }, // Carmesim vivo no lugar do vinho escuro
+
+  'Cultura Popular': { border: '#FB923C', badge: 'bg-orange-100 text-orange-900' },
+  'Cultura e Tradição Regional': { border: '#F59E0B', badge: 'bg-amber-100 text-amber-900' },
+  'Cultura Infantil e Brinquedos': { border: '#EC4899', badge: 'bg-pink-100 text-pink-900' },
+  'Gastronomia Tradicional': { border: '#E11D48', badge: 'bg-rose-100 text-rose-900' },
+
+  'Ciências e Tecnologia': { border: '#06B6D4', badge: 'bg-cyan-100 text-cyan-900' }, // Ciano brilhante
+  'Astronomia e Espaço': { border: '#2563EB', badge: 'bg-blue-100 text-blue-900' }, // Azul royal
+  'Ecomuseu e Meio Ambiente': { border: '#10B981', badge: 'bg-emerald-100 text-emerald-900' }, // Verde esmeralda vivo
+  'Povos Indígenas e Etnologia': { border: '#84CC16', badge: 'bg-lime-100 text-lime-950' }, // Verde oliva/lime vivo
+
+  'Memória e Direitos Humanos': { border: '#4F46E5', badge: 'bg-indigo-100 text-indigo-950' },
+  'Memória Institucional e Política': { border: '#0E7490', badge: 'bg-cyan-100 text-cyan-950' }, // Ciano escuro/petróleo no lugar do grafite
+
+  'Não informado': { border: '#93C5FD', badge: 'bg-blue-50 text-blue-800' }, // Azul pastel em vez de cinza/ardósia
+}
+
+// Normalizador refinado para mapear categorias do banco para os 21 termos oficiais
+export function normalizeCategory(cat) {
+  if (!cat || cat === 'Não informado') return 'Não informado'
+  const text = cat.toLowerCase()
+
+  // 1. Povos Indígenas
+  if (text.includes('indígena') || text.includes('etnologia')) {
+    return 'Povos Indígenas e Etnologia'
+  }
+
+  // 2. Ciências e Astronomia
+  if (text.includes('astronomia')) return 'Astronomia e Espaço'
+  if (text.includes('ciência') || text.includes('biológica') || text.includes('exatas') || text.includes('terra')) {
+    return 'Ciências e Tecnologia'
+  }
+
+  // 3. Meio Ambiente
+  if (text.includes('eco') || text.includes('ambiente') || text.includes('pesca')) {
+    return 'Ecomuseu e Meio Ambiente'
+  }
+
+  // 4. Artes e Subdivisões
+  if (text.includes('fotografia') || text.includes('imagem e som') || text.includes('audiovisual')) {
+    return 'Fotografia e Imagem'
+  }
+  if (text.includes('artesanato') || text.includes('arte popular')) {
+    return 'Arte Popular e Artesanato'
+  }
+  if (text.includes('artes visuais') || text.includes('arquitetura')) {
+    return 'Artes Visuais'
+  }
+  if (text.includes('arte') || text.includes('artes')) {
+    return 'Artes e Cultura'
+  }
+
+  // 5. Cultura Popular e Subdivisões
+  if (text.includes('brinquedo') || text.includes('infantil')) {
+    return 'Cultura Infantil e Brinquedos'
+  }
+  if (text.includes('gastronomia')) {
+    return 'Gastronomia Tradicional'
+  }
+  if (text.includes('cultura regional') || text.includes('tradição') || text.includes('música')) {
+    return 'Cultura e Tradição Regional'
+  }
+  if (text.includes('cultura popular') || text.includes('lazer')) {
+    return 'Cultura Popular'
+  }
+
+  // 6. História e Subdivisões
+  if (text.includes('abolição')) {
+    return 'História e Abolição'
+  }
+  if (text.includes('ferroviária') || text.includes('ferrovia') || text.includes('industrial')) {
+    return 'História Ferroviária e Industrial'
+  }
+  if (text.includes('arqueologia') || text.includes('antropologia')) {
+    return 'Arqueologia e Antropologia'
+  }
+  if (text.includes('história local') || text.includes('cultura local') || text.includes('memória local') || text.includes('comunitária')) {
+    return 'História Local e Regional'
+  }
+  if (text.includes('patrimônio')) {
+    return 'Patrimônio Histórico'
+  }
+
+  // 7. Memória e Sociedade
+  if (text.includes('direitos humanos') || text.includes('resistência') || text.includes('diversidade')) {
+    return 'Memória e Direitos Humanos'
+  }
+  if (text.includes('institucional') || text.includes('política') || text.includes('jurídica') || text.includes('educacional') || text.includes('educação')) {
+    return 'Memória Institucional e Política'
+  }
+  if (text.includes('história')) {
+    return 'História'
+  }
+
+  return 'Não informado'
 }
 
 export function getCategoryStyle(category) {
-  return CATEGORY_COLORS[category] ?? CATEGORY_COLORS['Não informado']
+  const normalized = normalizeCategory(category)
+  return CATEGORY_COLORS[normalized] ?? CATEGORY_COLORS['Não informado']
 }
 
 const allMuseums = ref([])
@@ -65,8 +121,8 @@ export function useMuseums() {
   const searchQuery = ref('')
   const activeCategory = ref(null)
   const onlyAccessible = ref(false)
+  const reviewFilter = ref('all')
 
-  // 1. BUSCAR DO BANCO DE DADOS
   const fetchMuseums = async () => {
     const { data, error } = await supabase
       .from('museus')
@@ -84,12 +140,10 @@ export function useMuseums() {
     if (allMuseums.value.length === 0) fetchMuseums()
   })
 
- // 2. ATUALIZAR MUSEU EXISTENTE
   const updateMuseum = async (id, museumData) => {
     try {
       const payload = { ...museumData }
 
-      // Garante maps_url e remove campos que não existem na tabela
       payload.maps_url = payload.maps_url || payload.mapsUrl || payload.link_google_maps || ''
       delete payload.mapsUrl
       delete payload.link_google_maps
@@ -121,7 +175,6 @@ export function useMuseums() {
     }
   }
 
-  // 3. MARCAR COMO REVISADO
   const toggleVerify = async (museum) => {
     if (!museum) return
 
@@ -132,7 +185,12 @@ export function useMuseums() {
       .eq('id', museum.id)
       .select()
 
-    if (!error && data && data[0]) {
+    if (error) {
+      alert(`Erro Supabase: ${error.message}`)
+      return
+    }
+
+    if (data && data[0]) {
       const index = allMuseums.value.findIndex(m => m.id === museum.id)
       if (index !== -1) {
         allMuseums.value[index] = data[0]
@@ -140,17 +198,15 @@ export function useMuseums() {
     }
   }
 
-  // 4. CADASTRAR NOVO MUSEU
   const addMuseum = async (museumData) => {
     try {
       const payload = { ...museumData }
       
-      if (payload.mapsUrl !== undefined) {
-        payload.maps_url = payload.mapsUrl
-        delete payload.mapsUrl
-      }
-
+      payload.maps_url = payload.maps_url || payload.mapsUrl || payload.link_google_maps || ''
+      delete payload.mapsUrl
+      delete payload.link_google_maps
       delete payload.id
+
       if (payload.lat === null || payload.lat === '') delete payload.lat
       if (payload.lng === null || payload.lng === '') delete payload.lng
       
@@ -175,9 +231,9 @@ export function useMuseums() {
     }
   }
 
+  // Lista com as 20 categorias ativas (excluindo apenas "Não informado" dos botões de filtro)
   const allCategories = computed(() => {
-    const cats = new Set(allMuseums.value.map((m) => m.categoria))
-    return [...cats].sort()
+    return Object.keys(CATEGORY_COLORS).filter(c => c !== 'Não informado')
   })
 
   const filteredMuseums = computed(() => {
@@ -187,10 +243,22 @@ export function useMuseums() {
       const matchesQuery = !query || 
         museum.nome?.toLowerCase().includes(query) || 
         museum.cidade?.toLowerCase().includes(query)
-      const matchesCategory = !activeCategory.value || museum.categoria === activeCategory.value
-      const matchesAccessibility = !onlyAccessible.value || (museum.acessibilidade && museum.acessibilidade !== 'Não informado')
 
-      return matchesQuery && matchesCategory && matchesAccessibility
+      const matchesCategory = !activeCategory.value || 
+        normalizeCategory(museum.categoria) === activeCategory.value
+
+      const matchesAccessibility = !onlyAccessible.value || 
+        (museum.acessibilidade && museum.acessibilidade !== 'Não informado')
+
+      const isRevisado = Boolean(museum.revisado)
+      let matchesReview = true
+      if (reviewFilter.value === 'verified') {
+        matchesReview = isRevisado
+      } else if (reviewFilter.value === 'unverified') {
+        matchesReview = !isRevisado
+      }
+
+      return matchesQuery && matchesCategory && matchesAccessibility && matchesReview
     })
   })
 
@@ -202,22 +270,29 @@ export function useMuseums() {
     activeCategory.value = activeCategory.value === category ? null : category
   }
 
+  function setReviewFilter(status) {
+    reviewFilter.value = status
+  }
+
   function clearFilters() {
     searchQuery.value = ''
     activeCategory.value = null
     onlyAccessible.value = false
+    reviewFilter.value = 'all'
   }
 
   return {
     searchQuery,
     activeCategory,
     onlyAccessible,
+    reviewFilter,
     allCategories,
     filteredMuseums,
     verifiedMuseums,
     verifiedCount: computed(() => allMuseums.value.filter(m => m.revisado).length),
     totalCount: computed(() => allMuseums.value.length),
     setCategory,
+    setReviewFilter,
     toggleVerify,
     addMuseum,
     updateMuseum,

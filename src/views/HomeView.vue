@@ -11,11 +11,13 @@ const {
   searchQuery,
   activeCategory,
   onlyAccessible,
+  reviewFilter,
   allCategories,
   filteredMuseums,
   verifiedCount,
   totalCount,
   setCategory,
+  setReviewFilter,
   toggleVerify,
   clearFilters,
   updateMuseum, 
@@ -23,7 +25,7 @@ const {
 } = useMuseums()
 
 const hasActiveFilters = computed(
-  () => !!searchQuery.value || !!activeCategory.value || onlyAccessible.value
+  () => !!searchQuery.value || !!activeCategory.value || onlyAccessible.value || reviewFilter?.value !== 'all'
 )
 
 const activeView = ref('list')
@@ -163,13 +165,16 @@ const handleSave = async (museumData) => {
         </div>
       </div>
 
+      <!-- FilterTags com os filtros integrados e sem misturar elementos externos -->
       <FilterTags
         :categories="allCategories"
         :active-category="activeCategory"
         :only-accessible="onlyAccessible"
+        :review-filter="reviewFilter"
         :has-active-filters="hasActiveFilters"
         @select-category="setCategory"
         @toggle-accessibility="toggleAccessibility"
+        @set-review-filter="setReviewFilter"
         @clear-filters="clearFilters"
       />
     </section>
@@ -190,7 +195,6 @@ const handleSave = async (museumData) => {
           </button>
         </div>
 
-        <!-- Renderiza a lista de cartões puros sem sujeira no template -->
         <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           <MuseumCard
             v-for="museum in filteredMuseums"

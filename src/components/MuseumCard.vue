@@ -35,42 +35,44 @@ const displayPhone = computed(() => {
 // --- LÓGICA DO QR CODE ---
 const showQR = ref(false)
 
-// Monta a URL dinâmica apontando para a página do museu no sistema em produção
 const museumUrl = computed(() => {
-  // Ajuste a URL base para o domínio real do seu projeto na Vercel
-  const baseUrl = 'https://rede-pop-ceara-museus.vercel.app/museu'
-  // Usa o ID se existir, senão usa o nome formatado para URL amigável
-  const idPath = props.museum.id || props.museum.nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-').toLowerCase()
-  return `${baseUrl}/${idPath}`
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'https://rede-pop-ceara-museus.vercel.app'
+  return `${origin}/museu/${props.museum.id}`
 })
 
-// Função para exportar e baixar o Canvas gerado como imagem PNG
 const downloadQRCode = (e) => {
-  const canvas = e.target.parentElement.querySelector('canvas')
+  const container = e.currentTarget.closest('div')
+  const canvas = container ? container.querySelector('canvas') : null
   if (canvas) {
     const url = canvas.toDataURL('image/png')
     const link = document.createElement('a')
     link.href = url
-    // Salva o arquivo com o nome limpo do museu
-    const cleanName = props.museum.nome.replace(/[^a-z0-9]/gi, '_').toLowerCase()
+    const cleanName = props.museum.nome 
+      ? props.museum.nome.replace(/[^a-z0-9]/gi, '_').toLowerCase() 
+      : `museu_${props.museum.id}`
     link.download = `QR_${cleanName}.png`
     link.click()
   }
+}
+
+const onEdit = () => {
+  emit('edit', props.museum)
+}
+
+const onVerify = () => {
+  emit('verify', props.museum)
 }
 </script>
 
 <template>
   <article
     class="
-      rounded-2xl border shadow-sm
+      bg-white rounded-2xl border shadow-sm
       hover:shadow-md hover:-translate-y-0.5
       transition-all duration-200 overflow-hidden
       flex flex-col
-      focus-within:ring-2 focus-within:ring-green-600/40
     "
-    :class="museum.revisado ? 'border-amber-300 bg-amber-50/10' : 'border-slate-100 bg-white'"
-    :aria-label="`Museu: ${museum.nome}, ${museum.cidade}`"
-  >
+    >
     <div
       class="h-1 w-full flex-shrink-0"
       :style="{ backgroundColor: categoryStyle.border }"
@@ -147,8 +149,7 @@ const downloadQRCode = (e) => {
       </div>
 
       <div class="flex items-center gap-2 pt-1 border-t border-slate-50 flex-wrap">
-       <!-- CORRIGIDO: museum.maps_url EM VEZ DE museum.maps_url -->
-       <a
+        <a
           :href="museum.maps_url"
           target="_blank"
           rel="noopener noreferrer"
@@ -156,7 +157,10 @@ const downloadQRCode = (e) => {
           style="background-color: #1A6B5A;"
           :class="{ 'opacity-50 pointer-events-none': !museum.maps_url }"
         >
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
           Ver no Mapa
         </a>
 
@@ -167,7 +171,11 @@ const downloadQRCode = (e) => {
           rel="noopener noreferrer"
           class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all duration-150 active:scale-95"
         >
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M2 12h20"/>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+          </svg>
           Site
         </a>
       </div>
@@ -175,8 +183,9 @@ const downloadQRCode = (e) => {
       <!-- BOTÃO E ÁREA DO QR CODE -->
       <div class="pt-2 border-t border-slate-100 flex flex-col gap-2">
         <button
+          type="button"
           @click="showQR = !showQR"
-          class="w-full py-2 px-3 rounded-xl text-[11px] font-bold border transition-all flex items-center justify-center gap-1.5"
+          class="w-full py-2 px-3 rounded-xl text-[11px] font-bold border transition-all flex items-center justify-center gap-1.5 cursor-pointer"
           :class="showQR ? 'bg-teal-700 text-white border-teal-800 hover:bg-teal-800' : 'bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-100'"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -188,12 +197,15 @@ const downloadQRCode = (e) => {
           {{ showQR ? 'Ocultar QR Code' : 'Gerar QR Code' }}
         </button>
 
-        <div v-if="showQR" class="flex flex-col items-center justify-center p-3 bg-slate-50 border border-slate-200 rounded-xl mt-1 animate-in fade-in slide-in-from-top-2">
-          <!-- Componente do QR Code que renderiza o Canvas -->
+        <div v-if="showQR" class="flex flex-col items-center justify-center p-3 bg-slate-50 border border-slate-200 rounded-xl mt-1">
           <qrcode-vue :value="museumUrl" :size="140" level="H" render-as="canvas" class="bg-white p-2 rounded shadow-sm border border-slate-200" />
           
-          <button @click="downloadQRCode" class="mt-3 text-[10px] font-bold text-teal-600 hover:text-teal-800 underline uppercase tracking-wider flex items-center gap-1">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+          <button type="button" @click="downloadQRCode" class="mt-3 text-[10px] font-bold text-teal-600 hover:text-teal-800 underline uppercase tracking-wider flex items-center gap-1 cursor-pointer">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" x2="12" y1="15" y2="3"/>
+            </svg>
             Baixar para Impressão
           </button>
         </div>
@@ -201,18 +213,22 @@ const downloadQRCode = (e) => {
 
       <div class="flex items-center gap-2 pt-2 flex-wrap">
         <button
-          @click="$emit('edit', museum)"
-          class="flex-1 py-2 px-3 rounded-xl text-[11px] font-bold border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all"
+          type="button"
+          @click="onEdit"
+          class="flex-1 py-2 px-3 rounded-xl text-[11px] font-bold border border-slate-200 text-slate-600 hover:bg-slate-50 transition-all cursor-pointer"
         >
           Editar Info
         </button>
         
         <button
-          @click="$emit('verify', museum)"
-          class="flex-1 py-2 px-3 rounded-xl text-[11px] font-bold border transition-all flex items-center justify-center gap-1"
+          type="button"
+          @click="onVerify"
+          class="flex-1 py-2 px-3 rounded-xl text-[11px] font-bold border transition-all flex items-center justify-center gap-1 cursor-pointer"
           :class="museum.revisado ? 'bg-amber-500 text-white border-amber-600 hover:bg-amber-600' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'"
         >
-          <svg v-if="!museum.revisado" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          <svg v-if="!museum.revisado" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 6 9 17l-5-5"/>
+          </svg>
           {{ museum.revisado ? 'Revisado ✓' : 'Marcar Revisado' }}
         </button>
       </div>

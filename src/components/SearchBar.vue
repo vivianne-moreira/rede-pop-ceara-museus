@@ -80,18 +80,4 @@ const emit = defineEmits(['update:modelValue'])
       </button>
     </Transition>
   </div>
-
-  <div
-    id="search-result-count"
-    aria-live="polite"
-    aria-atomic="true"
-    class="mt-1.5 text-xs text-slate-500 pl-1"
-  >
-    <span v-if="modelValue">
-      {{ resultCount }} resultado{{ resultCount !== 1 ? 's' : '' }} encontrado{{ resultCount !== 1 ? 's' : '' }}
-    </span>
-    <span v-else>
-      {{ totalCount }} museus cadastrados
-    </span>
-  </div>
 </template>

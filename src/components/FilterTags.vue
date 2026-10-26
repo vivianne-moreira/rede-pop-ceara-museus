@@ -15,23 +15,29 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  reviewFilter: {
+    type: String,
+    default: 'all', // 'all' | 'verified' | 'unverified'
+  },
   hasActiveFilters: {
     type: Boolean,
     default: false,
   },
 })
 
-const emit = defineEmits(['select-category', 'toggle-accessibility', 'clear-filters'])
+const emit = defineEmits([
+  'select-category',
+  'toggle-accessibility',
+  'set-review-filter',
+  'clear-filters'
+])
 
-// Nova variável reativa para controlar se a aba de categorias está aberta ou fechada
 const isExpanded = ref(false)
 
-// Fecha a aba automaticamente se o utilizador clicar em "Limpar filtros"
 watch(() => props.hasActiveFilters, (newVal) => {
   if (!newVal) isExpanded.value = false
 })
 
-// Função para selecionar categoria e fechar a aba automaticamente para poupar espaço
 const handleCategorySelect = (category) => {
   emit('select-category', category)
   isExpanded.value = false
@@ -64,8 +70,36 @@ const handleCategorySelect = (category) => {
       </Transition>
     </div>
 
-<!-- Botões Principais Fixos -->
+    <!-- Botões Principais Fixos -->
     <div class="flex flex-wrap gap-2 items-center">
+      <!-- Seletor de Status de Revisão (Todos / Revisados / Não revisados) -->
+      <div class="inline-flex rounded-lg border border-slate-200 p-0.5 bg-slate-50 text-xs font-semibold">
+        <button
+          type="button"
+          @click="emit('set-review-filter', 'all')"
+          class="px-2.5 py-1.5 rounded-md transition-all duration-150"
+          :class="reviewFilter === 'all' ? 'bg-white text-slate-800 shadow-sm font-bold' : 'text-slate-500 hover:text-slate-800'"
+        >
+          Todos
+        </button>
+        <button
+          type="button"
+          @click="emit('set-review-filter', 'verified')"
+          class="px-2.5 py-1.5 rounded-md transition-all duration-150 flex items-center gap-1"
+          :class="reviewFilter === 'verified' ? 'bg-amber-500 text-white shadow-sm font-bold' : 'text-slate-500 hover:text-slate-800'"
+        >
+          <span>✓</span> Revisados
+        </button>
+        <button
+          type="button"
+          @click="emit('set-review-filter', 'unverified')"
+          class="px-2.5 py-1.5 rounded-md transition-all duration-150"
+          :class="reviewFilter === 'unverified' ? 'bg-slate-700 text-white shadow-sm font-bold' : 'text-slate-500 hover:text-slate-800'"
+        >
+          Não revisados
+        </button>
+      </div>
+
       <!-- Botão Acessibilidade -->
       <button
         type="button"
@@ -118,7 +152,6 @@ const handleCategorySelect = (category) => {
     <div v-show="isExpanded" class="pt-3 mt-3 border-t border-slate-100">
       <p class="text-[11px] text-slate-400 mb-2 font-medium">Escolha uma categoria para filtrar os resultados:</p>
       
-      <!-- max-h-48 e overflow-y-auto criam uma rolagem interna caso existam muitas tags -->
       <div class="flex flex-wrap gap-2 max-h-48 overflow-y-auto pr-2 pb-2" role="group" aria-label="Filtrar por categoria temática">
         <button
           v-for="category in categories"
@@ -149,6 +182,5 @@ const handleCategorySelect = (category) => {
         </button>
       </div>
     </div>
-    
   </div>
 </template>
