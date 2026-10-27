@@ -54,7 +54,6 @@ function toggleAccessibility() {
   onlyAccessible.value = !onlyAccessible.value
 }
 
-// Controle do Modal
 const openAddForm = () => {
   if (!checkAccess()) return
   selectedMuseum.value = null
@@ -165,7 +164,6 @@ const handleSave = async (museumData) => {
         </div>
       </div>
 
-      <!-- FilterTags com os filtros integrados e sem misturar elementos externos -->
       <FilterTags
         :categories="allCategories"
         :active-category="activeCategory"
@@ -195,7 +193,7 @@ const handleSave = async (museumData) => {
           </button>
         </div>
 
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 items-start">
           <MuseumCard
             v-for="museum in filteredMuseums"
             :key="museum.id"

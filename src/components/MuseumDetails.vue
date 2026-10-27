@@ -1,7 +1,6 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-// Ajuste o caminho de importação do seu cliente Supabase conforme a sua estrutura de pastas
 import { supabase } from '@/supabase' 
 
 const route = useRoute()
@@ -33,7 +32,6 @@ onMounted(async () => {
   }
 })
 
-// Função para formatar o telefone dinamicamente
 const displayPhone = computed(() => {
   if (!museum.value?.telefone || museum.value.telefone === 'Não informado') return null
   const digits = museum.value.telefone.replace(/\D/g, '')
